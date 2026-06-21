@@ -10,6 +10,10 @@ export const TID = {
   loadSampleBtn: "load-sample-btn",
   parseError: "parse-error",
   errorReportBtn: "error-report-btn",
+  pdfPasswordInput: "pdf-password-input",
+  pdfPasswordSubmit: "pdf-password-submit",
+  pdfPasswordCancel: "pdf-password-cancel",
+  pdfPasswordError: "pdf-password-error",
 
   // Header
   appHeader: "app-header",
