@@ -30,9 +30,74 @@ export function detectPatterns(entities, transactions) {
     txByEntity.get(tx.entityId).push(tx);
   }
 
+  // -------------------- 0. Self-transfer detection --------------------
+  // PhonePe rows include a "Debited from XX8494" line — that's the user's OWN account.
+  // Collect every account the user has been seen debiting/crediting from. Then any
+  // masked-account counterparty whose digit suffix matches one of those is a transfer
+  // between the user's own wallets (NOT spend, NOT suspicious — just material info).
+  const userAccountDigits = new Set();
+  for (const tx of transactions) {
+    if (tx.userAccountDigits) userAccountDigits.add(tx.userAccountDigits);
+  }
+  // Also tolerate suffix-only matches (last 4 digits of the masked counterparty).
+  const userSuffix4 = new Set();
+  for (const d of userAccountDigits) {
+    if (d && d.length >= 4) userSuffix4.add(d.slice(-4));
+  }
+
+  // Group self-transfer txns by the user-account-pair so the panel doesn't explode.
+  if (userAccountDigits.size > 0) {
+    const selfByEntity = new Map();
+    for (const tx of transactions) {
+      if (!tx.isMasked) continue;
+      const counterDigits = (tx.nameOriginal.match(/\d+/g) || []).join("");
+      const counterSuffix = counterDigits.slice(-4);
+      const isSelf =
+        (counterDigits && userAccountDigits.has(counterDigits)) ||
+        (counterSuffix && userSuffix4.has(counterSuffix));
+      if (!isSelf) continue;
+      // Don't flag a row whose counterparty equals its OWN sourcing account (that would
+      // be a weird parse — skip).
+      if (
+        tx.userAccountDigits &&
+        (counterDigits === tx.userAccountDigits || counterSuffix === tx.userAccountDigits.slice(-4))
+      ) {
+        continue;
+      }
+      if (!selfByEntity.has(tx.entityId)) selfByEntity.set(tx.entityId, []);
+      selfByEntity.get(tx.entityId).push(tx);
+    }
+    for (const [entityId, txs] of selfByEntity.entries()) {
+      const entity = entities.find((e) => e.entityId === entityId);
+      if (!entity) continue;
+      const total = txs.reduce((s, t) => s + t.amount, 0);
+      const fromAccts = Array.from(
+        new Set(txs.map((t) => t.userAccount).filter(Boolean))
+      ).join(", ");
+      findings.push({
+        id: makeId("self"),
+        type: "self_transfer",
+        severity: "medium",
+        label: `Self-transfer · ${entity.displayName}`,
+        reason: `Counterparty matches one of the user's own accounts${
+          fromAccts ? ` (sourced from ${fromAccts})` : ""
+        }. ${txs.length} transfer${txs.length === 1 ? "" : "s"} totalling ${formatAmt(
+          total
+        )} — excluded from real "spend" analysis.`,
+        entityId,
+        transactionIds: txs.map((t) => t.transactionId),
+        confidence: 0.92,
+      });
+    }
+  }
+
   // 8. Masked account detection — produce one finding per masked entity
+  //    BUT skip entities already identified as self-transfers (more specific finding).
+  const selfTransferEntities = new Set(
+    findings.filter((f) => f.type === "self_transfer").map((f) => f.entityId)
+  );
   for (const e of entities) {
-    if (e.isMasked) {
+    if (e.isMasked && !selfTransferEntities.has(e.entityId)) {
       const txs = txByEntity.get(e.entityId) || [];
       findings.push({
         id: makeId("mask"),

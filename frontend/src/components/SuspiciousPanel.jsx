@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useStore } from "../store/useStore";
 import { TID } from "../constants/testIds";
 import { fmtAmount, pct } from "../lib/format";
-import { CheckCircle2, EyeOff, Asterisk, AlertOctagon, Repeat, Layers, Hash, ArrowDownUp } from "lucide-react";
+import { CheckCircle2, EyeOff, Asterisk, AlertOctagon, Repeat, Layers, Hash, ArrowDownUp, ArrowLeftRight, SplitSquareHorizontal } from "lucide-react";
 
 const SEV_BORDER = {
   high: "border-l-red-500",
@@ -23,6 +23,7 @@ const TYPE_ICON = {
   round_number: Hash,
   masked_account: Asterisk,
   abnormal_small: AlertOctagon,
+  self_transfer: ArrowLeftRight,
 };
 
 export default function SuspiciousPanel() {
@@ -33,6 +34,8 @@ export default function SuspiciousPanel() {
   const reviewed = useStore((s) => s.reviewedFindings);
   const markFindingReviewed = useStore((s) => s.markFindingReviewed);
   const ignoreAlias = useStore((s) => s.ignoreAlias);
+  const splitAlias = useStore((s) => s.splitAlias);
+  const forcedSplits = useStore((s) => s.forcedSplits);
   const selectEntity = useStore((s) => s.selectEntity);
   const selectTransaction = useStore((s) => s.selectTransaction);
 
@@ -91,7 +94,9 @@ export default function SuspiciousPanel() {
             <div className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-slate-500 bg-slate-900/60">
               similar names · {entity.aliasCount}
             </div>
-            {entity.aliases.map((a) => (
+            {entity.aliases.map((a) => {
+              const isSplit = forcedSplits.includes(a.name);
+              return (
               <div
                 key={a.name}
                 data-testid={TID.aliasRow}
@@ -107,17 +112,35 @@ export default function SuspiciousPanel() {
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-slate-600">×{a.count}</span>
-                  <button
-                    data-testid={TID.ignoreAliasBtn}
-                    onClick={() => ignoreAlias(entity.entityId, a.name)}
-                    className="text-[10px] text-slate-500 hover:text-amber-400 uppercase tracking-wider flex items-center gap-1"
-                  >
-                    <EyeOff className="w-3 h-3" />
-                    {a.ignored ? "restore" : "ignore"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {entity.aliasCount > 1 && (
+                      <button
+                        data-testid={TID.splitAliasBtn}
+                        onClick={() => splitAlias(a.name)}
+                        className={`text-[10px] uppercase tracking-wider flex items-center gap-1 ${
+                          isSplit
+                            ? "text-amber-400"
+                            : "text-slate-500 hover:text-amber-400"
+                        }`}
+                        title={isSplit ? "un-split this alias" : "split this alias into its own entity"}
+                      >
+                        <SplitSquareHorizontal className="w-3 h-3" />
+                        {isSplit ? "splitting" : "split"}
+                      </button>
+                    )}
+                    <button
+                      data-testid={TID.ignoreAliasBtn}
+                      onClick={() => ignoreAlias(entity.entityId, a.name)}
+                      className="text-[10px] text-slate-500 hover:text-amber-400 uppercase tracking-wider flex items-center gap-1"
+                    >
+                      <EyeOff className="w-3 h-3" />
+                      {a.ignored ? "restore" : "ignore"}
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

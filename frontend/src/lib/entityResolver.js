@@ -34,14 +34,17 @@ function chooseDisplayName(originals) {
 /**
  * Resolve entities from transactions.
  * @param {Array} transactions - normalized transactions (each with nameOriginal)
- * @param {Object} options - { manualMerges: { [matchKey]: targetEntityId }, manualSplits: Set of matchKeys to never merge with others }
+ * @param {Object} options - { manualMerges, ignoredAliases, forcedSplits }
  * @returns { entities: Array, txWithEntities: Array }
  */
-export function resolveEntities(transactions, { manualMerges = {}, ignoredAliases = new Set() } = {}) {
+export function resolveEntities(
+  transactions,
+  { manualMerges = {}, ignoredAliases = new Set(), forcedSplits = new Set() } = {}
+) {
   // Step 1: group by match key
   const byKey = new Map();
   for (const tx of transactions) {
-    const key = buildMatchKey(tx.nameOriginal);
+    const key = buildMatchKey(tx.nameOriginal, forcedSplits);
     if (!byKey.has(key)) byKey.set(key, []);
     byKey.get(key).push(tx);
   }

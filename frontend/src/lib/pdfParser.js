@@ -124,6 +124,12 @@ function cleanName(rawName) {
 /**
  * Parse a PhonePe (or PhonePe-style) PDF statement.
  * Returns { transactions, errors } — same shape as parseCsvFile.
+ *
+ * In addition to the headline date/name/amount, we also capture the user's own
+ * account number from the multi-line metadata block that follows each row
+ * ("Debited from XX8494" / "Credited to XX8494"). This lets the pattern
+ * detector flag self-transfers — i.e. payments to an account that the user
+ * has previously been seen debiting/crediting from.
  */
 export async function parsePdfFile(file, { password } = {}) {
   const lines = await extractLines(file, password);
@@ -144,7 +150,13 @@ export async function parsePdfFile(file, { password } = {}) {
     }
   }
 
-  for (const line of merged) {
+  // Helper: pull trailing account digits from a "Debited from XX8494" / "Credited to XX8494" line.
+  // We keep the full masked form (e.g. "XX8494") AND the digit suffix (for fuzzy matching).
+  const FROM_RX =
+    /(?:Debited from|Credited to|From|To)\s+([Xx*]+\d{2,}|\d{2,}[Xx*]+|XX+\d{2,})/i;
+
+  for (let i = 0; i < merged.length; i++) {
+    const line = merged[i];
     const m = TXN_LINE_RX.exec(line);
     if (!m) continue;
     idx += 1;
@@ -153,6 +165,18 @@ export async function parsePdfFile(file, { password } = {}) {
     const date = parseDate(dateStr);
     const amount = parseFloat(amtStr.replace(/,/g, ""));
     const name = cleanName(body);
+
+    // Look at the next few lines (until the next txn row) for the user's own account.
+    let userAccount = null;
+    for (let j = i + 1; j < Math.min(merged.length, i + 6); j++) {
+      if (TXN_LINE_RX.test(merged[j])) break;
+      const fm = FROM_RX.exec(merged[j]);
+      if (fm) {
+        userAccount = fm[1].toUpperCase();
+        break;
+      }
+    }
+    const userAccountDigits = userAccount ? (userAccount.match(/\d+/g) || []).join("") : null;
 
     const rowErrors = [];
     if (!date) rowErrors.push("invalid_date");
@@ -163,7 +187,7 @@ export async function parsePdfFile(file, { password } = {}) {
       errors.push({
         sourceRowIndex,
         reasons: rowErrors,
-        raw: { line, dateStr, name, dir, amtStr },
+        raw: { line, dateStr, name, dir, amtStr, userAccount },
       });
       continue;
     }
@@ -174,11 +198,21 @@ export async function parsePdfFile(file, { password } = {}) {
       date,
       dateKey: dateKey(date),
       nameOriginal: normalizeForDisplay(name),
-      direction: dir, // "Debit" or "Credit" — both kept, no filtering anywhere
+      direction: dir, // both "Debit" and "Credit" are first-class
       amount,
       category: "Other",
       isMasked: isMaskedAccount(name),
-      rawRow: { source: "pdf", line, date: dateStr, name, direction: dir, amount: amtStr },
+      userAccount,           // e.g. "XX8494"  (user's own account this row touched)
+      userAccountDigits,     // e.g. "8494"    (digits-only suffix, for matching)
+      rawRow: {
+        source: "pdf",
+        line,
+        date: dateStr,
+        name,
+        direction: dir,
+        amount: amtStr,
+        userAccount,
+      },
     });
   }
 

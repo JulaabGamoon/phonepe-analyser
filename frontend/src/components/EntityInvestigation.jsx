@@ -5,6 +5,7 @@ import { fmtAmount, fmtDate, pct } from "../lib/format";
 import { Pin, ChevronRight, Hash, Calendar, TrendingDown, TrendingUp } from "lucide-react";
 import TransactionTable from "./TransactionTable";
 import DateDrillDown from "./DateDrillDown";
+import HeatmapTimeline from "./HeatmapTimeline";
 
 function MetricCard({ label, value, sub, tone = "default" }) {
   const toneClass =
@@ -114,6 +115,7 @@ export default function EntityInvestigation() {
   const yearly = Array.from(entity.byYear?.values?.() ?? []).sort((a, b) => String(a.key).localeCompare(String(b.key)));
   const monthly = Array.from(entity.byMonth?.values?.() ?? []).sort((a, b) => a.key.localeCompare(b.key));
   const isPinned = pinned.includes(entity.entityId);
+  const isSelfTransfer = entityTxs.some((t) => (t.flags || []).includes("self_transfer"));
 
   return (
     <section
@@ -164,8 +166,13 @@ export default function EntityInvestigation() {
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* Entity-specific activity heatmap */}
+        <div className="px-6 pt-5">
+          <HeatmapTimeline entityId={entity.entityId} />
+        </div>
+
         {/* Metric grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 border-l border-t border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 border-l border-t border-slate-800 mt-6">
           <MetricCard label="transactions" value={entity.txCount} />
           <MetricCard
             label="total debit"

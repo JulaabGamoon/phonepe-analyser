@@ -55,5 +55,11 @@ export const TID = {
   similarNames: "similar-names",
   aliasRow: "alias-row",
   ignoreAliasBtn: "ignore-alias-btn",
+  splitAliasBtn: "split-alias-btn",
   reviewedBtn: "reviewed-btn",
+
+  // Heatmap
+  heatmapTimeline: "heatmap-timeline",
+  heatmapCell: "heatmap-cell",
+  heatmapPeakBtn: "heatmap-peak-btn",
 };

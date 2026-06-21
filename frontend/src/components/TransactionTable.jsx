@@ -15,6 +15,7 @@ const FLAG_LABEL = {
   round_number: "RND",
   masked_account: "MASK",
   abnormal_small: "SML",
+  self_transfer: "SELF",
 };
 
 export default function TransactionTable({ transactions, onRowClick, onDateClick, height = 360 }) {

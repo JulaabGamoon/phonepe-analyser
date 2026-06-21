@@ -104,9 +104,14 @@ function collapseInitials(tokens) {
 /**
  * Build the matching key used to cluster aliases.
  * Two names with the same matching key are merged automatically.
+ * If `forcedSplits` (Set of original names) contains this name, return a
+ * unique key so it cannot merge with anything else.
  */
-export function buildMatchKey(rawName) {
+export function buildMatchKey(rawName, forcedSplits) {
   if (!rawName) return "";
+  if (forcedSplits && forcedSplits.has(String(rawName))) {
+    return "__split__::" + String(rawName);
+  }
   if (isMaskedAccount(rawName)) {
     // Strip leading/trailing whitespace, keep masked suffix to differentiate accounts
     const digits = String(rawName).match(/\d+/g);

@@ -8,7 +8,7 @@ import { aggregate } from "../lib/aggregator";
 import { detectPatterns } from "../lib/patternDetector";
 
 function recompute(state) {
-  const { transactions: rawTx, manualMerges, ignoredAliases } = state;
+  const { transactions: rawTx, manualMerges, ignoredAliases, forcedSplits } = state;
   if (!rawTx.length) {
     return {
       entities: [],
@@ -20,7 +20,11 @@ function recompute(state) {
   }
   const { entities: resolvedEntities, transactions: txWithEntities } = resolveEntities(
     rawTx,
-    { manualMerges, ignoredAliases: new Set(ignoredAliases) }
+    {
+      manualMerges,
+      ignoredAliases: new Set(ignoredAliases),
+      forcedSplits: new Set(forcedSplits || []),
+    }
   );
   const { entities: enrichedEntities } = aggregate(resolvedEntities, txWithEntities);
   const findings = detectPatterns(enrichedEntities, txWithEntities);
@@ -73,6 +77,7 @@ export const useStore = create(
       // User decisions (persisted)
       manualMerges: {}, // sourceMatchKey -> targetMatchKey
       ignoredAliases: [], // array of "entityId::aliasName"
+      forcedSplits: [], // array of alias original-name strings to never merge
       pinnedEntities: [], // entityIds
       notes: {}, // entityId -> string
       reviewedFindings: [], // finding ids
@@ -160,6 +165,14 @@ export const useStore = create(
           const newState = { ...s, ignoredAliases: next };
           return { ...newState, ...recompute(newState) };
         }),
+      splitAlias: (aliasName) =>
+        set((s) => {
+          const next = s.forcedSplits.includes(aliasName)
+            ? s.forcedSplits.filter((n) => n !== aliasName)
+            : [...s.forcedSplits, aliasName];
+          const newState = { ...s, forcedSplits: next };
+          return { ...newState, ...recompute(newState) };
+        }),
       manualMerge: (sourceKey, targetKey) =>
         set((s) => {
           const next = { ...s.manualMerges, [sourceKey]: targetKey };
@@ -180,6 +193,7 @@ export const useStore = create(
       partialize: (s) => ({
         manualMerges: s.manualMerges,
         ignoredAliases: s.ignoredAliases,
+        forcedSplits: s.forcedSplits,
         pinnedEntities: s.pinnedEntities,
         notes: s.notes,
         reviewedFindings: s.reviewedFindings,
