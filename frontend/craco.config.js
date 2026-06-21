@@ -61,6 +61,40 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
+  // webpack-dev-server v5 removed several v4 options. CRA still passes them.
+  // Strip / bridge them so the dev server starts.
+  const beforeMw = devServerConfig.onBeforeSetupMiddleware;
+  const afterMw = devServerConfig.onAfterSetupMiddleware;
+  delete devServerConfig.onBeforeSetupMiddleware;
+  delete devServerConfig.onAfterSetupMiddleware;
+  if (beforeMw || afterMw) {
+    const originalSetup = devServerConfig.setupMiddlewares;
+    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+      if (beforeMw) beforeMw(devServer);
+      if (originalSetup) middlewares = originalSetup(middlewares, devServer);
+      if (afterMw) afterMw(devServer);
+      return middlewares;
+    };
+  }
+
+  // https / http2 -> server
+  if (devServerConfig.https !== undefined) {
+    const httpsOpt = devServerConfig.https;
+    delete devServerConfig.https;
+    if (httpsOpt) {
+      devServerConfig.server = typeof httpsOpt === "object"
+        ? { type: "https", options: httpsOpt }
+        : { type: "https" };
+    }
+  }
+  if (devServerConfig.http2 !== undefined) {
+    delete devServerConfig.http2;
+  }
+  // magicHtml removed in v5
+  if (devServerConfig.magicHtml !== undefined) {
+    delete devServerConfig.magicHtml;
+  }
+
   // Add health check endpoints if enabled
   if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
     const originalSetupMiddlewares = devServerConfig.setupMiddlewares;

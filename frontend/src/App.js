@@ -1,54 +1,46 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import { HOME } from "@/constants/testIds";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          data-testid={HOME.emergentLink}
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import React from "react";
+import { Toaster } from "sonner";
+import { useStore } from "./store/useStore";
+import UploadView from "./components/UploadView";
+import EntityExplorer from "./components/EntityExplorer";
+import EntityInvestigation from "./components/EntityInvestigation";
+import SuspiciousPanel from "./components/SuspiciousPanel";
+import TransactionDetail from "./components/TransactionDetail";
+import Header from "./components/Header";
+import "./App.css";
 
 function App() {
+  const hasData = useStore((s) => s.transactions.length > 0);
+
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="App h-screen w-full flex flex-col overflow-hidden bg-slate-950 text-slate-50">
+      {!hasData ? (
+        <UploadView />
+      ) : (
+        <>
+          <Header />
+          <div className="flex-1 flex overflow-hidden">
+            <EntityExplorer />
+            <EntityInvestigation />
+            <SuspiciousPanel />
+          </div>
+          <TransactionDetail />
+        </>
+      )}
+      <Toaster
+        theme="dark"
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: "rgb(15 23 42)",
+            border: "1px solid rgb(30 41 59)",
+            color: "rgb(241 245 249)",
+            fontFamily: "JetBrains Mono, monospace",
+            fontSize: "12px",
+            borderRadius: 0,
+          },
+        }}
+      />
     </div>
   );
 }
