@@ -1,0 +1,128 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) / Terminal-Inspired Forensic",
+  "typography": {
+    "fonts": {
+      "heading": "Chivo",
+      "body": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    },
+    "hierarchy": {
+      "h1": "text-3xl tracking-tight font-bold text-slate-50",
+      "h2": "text-xl tracking-tight font-semibold text-slate-50",
+      "h3": "text-lg tracking-tight font-semibold text-slate-200",
+      "body": "text-sm leading-relaxed text-slate-300",
+      "mono_data": "font-mono text-sm tracking-tight text-slate-300 tabular-nums",
+      "overline": "text-xs font-mono uppercase tracking-[0.2em] text-slate-400"
+    }
+  },
+  "colors": {
+    "background": {
+      "canvas": "bg-slate-950",
+      "panel": "bg-slate-900",
+      "elevated": "bg-slate-800",
+      "interactive": "hover:bg-slate-800"
+    },
+    "text": {
+      "primary": "text-slate-50",
+      "secondary": "text-slate-400",
+      "tertiary": "text-slate-500"
+    },
+    "brand": {
+      "primary": "text-amber-500",
+      "bg_primary": "bg-amber-500",
+      "border_primary": "border-amber-500/50"
+    },
+    "severity": {
+      "critical": "text-red-400 bg-red-400/10 border-red-400/20",
+      "warning": "text-amber-400 bg-amber-400/10 border-amber-400/20",
+      "info": "text-blue-400 bg-blue-400/10 border-blue-400/20",
+      "success": "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
+    },
+    "borders": "border-slate-800"
+  },
+  "layout": {
+    "spacing": {
+      "page_padding": "p-6",
+      "panel_gap": "gap-6",
+      "dense_row": "py-2 px-3"
+    },
+    "structure": {
+      "app_shell": "h-screen w-full flex overflow-hidden bg-slate-950 text-slate-50",
+      "sidebar_left": "w-80 flex-shrink-0 border-r border-slate-800 bg-slate-900/50 flex flex-col overflow-hidden",
+      "main_canvas": "flex-1 flex flex-col min-w-0 overflow-hidden",
+      "sidebar_right": "w-80 lg:w-96 flex-shrink-0 border-l border-slate-800 bg-slate-900/50 flex flex-col overflow-hidden",
+      "panel_header": "h-14 border-b border-slate-800 flex items-center justify-between px-4 shrink-0 bg-slate-900",
+      "scroll_area": "flex-1 overflow-y-auto custom-scrollbar"
+    }
+  },
+  "surfaces": {
+    "cards": "bg-slate-900 border border-slate-800 rounded-none",
+    "glass": "backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/50",
+    "inputs": "bg-slate-950 border border-slate-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 rounded-none transition-colors text-sm",
+    "buttons_primary": "bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 rounded-none transition-colors px-4 py-2 text-sm",
+    "buttons_secondary": "bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 rounded-none transition-colors px-4 py-2 text-sm",
+    "buttons_ghost": "hover:bg-slate-800 text-slate-300 hover:text-slate-50 rounded-none transition-colors px-4 py-2 text-sm"
+  },
+  "components": {
+    "data_table": {
+      "wrapper": "border border-slate-800 rounded-none flex flex-col h-full bg-slate-900/50",
+      "header": "bg-slate-900 sticky top-0 z-10 border-b border-slate-800",
+      "header_cell": "px-4 py-2 text-left text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold",
+      "row": "border-b border-slate-800/50 hover:bg-slate-800/80 transition-colors group cursor-pointer",
+      "cell": "px-4 py-1.5 text-sm whitespace-nowrap",
+      "numeric_cell": "font-mono text-right tabular-nums tracking-tight"
+    },
+    "metric_card": {
+      "container": "p-4 border-r border-b border-slate-800 flex flex-col gap-1 bg-slate-900/30",
+      "label": "text-xs font-mono uppercase tracking-[0.2em] text-slate-400",
+      "value": "font-mono text-2xl text-slate-50 tracking-tight tabular-nums",
+      "trend_up": "text-emerald-400 text-xs font-mono",
+      "trend_down": "text-red-400 text-xs font-mono"
+    },
+    "filter_chip": {
+      "base": "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-none border transition-colors",
+      "active": "border-amber-500/50 bg-amber-500/10 text-amber-400",
+      "inactive": "border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+    },
+    "suspicious_flag": {
+      "container": "p-3 border-l-2 bg-slate-900 border-b border-r border-slate-800 flex flex-col gap-1",
+      "high": "border-l-red-500",
+      "medium": "border-l-amber-500",
+      "low": "border-l-blue-500"
+    },
+    "entity_list_item": {
+      "container": "p-3 border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer flex flex-col gap-1 transition-colors",
+      "active": "bg-slate-800 border-l-2 border-l-amber-500"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "stroke_width": 1.5,
+    "size": {
+      "sm": "w-3.5 h-3.5",
+      "md": "w-4 h-4",
+      "lg": "w-5 h-5"
+    }
+  },
+  "animation": {
+    "hover": "transition-all duration-200 ease-in-out",
+    "drawer": "transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
+  },
+  "media": {
+    "images": []
+  },
+  "data_testid_rules": "All interactive elements, rows, and key metrics MUST have a data-testid attribute in kebab-case, specifying their role (e.g., 'entity-list-item', 'transaction-row', 'filter-chip-date').",
+  "instructions_to_main_agent": [
+    "Do not implement complex routing if not needed; state-based view switching is acceptable for a single-page app.",
+    "Build a 3-pane layout: Left Sidebar (Entities), Main Canvas (Investigation), Right Sidebar (Findings).",
+    "Use pure HTML/Tailwind (divs, sections) for the complex layout grid to ensure maximum screen real estate and exact control. Avoid restricting container components from Shadcn for layout.",
+    "Data tables must use JetBrains Mono for all amounts, IDs, and dates, with tabular-nums.",
+    "Implement 'Grid Borders (The Technical Look)' for the summary bento/cards: border-collapse style layout, subtle borders on right and bottom, flat backgrounds.",
+    "Do NOT use soft shadows or rounded corners (radius). Keep UI sharp and rectangular (rounded-none) for the forensic/terminal feel.",
+    "Ensure the app functions perfectly client-side (parsing CSV, generating metrics in-memory, filtering).",
+    "Implement virtualization (e.g., @tanstack/react-virtual) for the transaction table to handle 100,000+ rows smoothly. This is critical.",
+    "Apply custom CSS to hide scrollbars or use thin, styled scrollbars to maximize data density.",
+    "Color logic: Credits should use emerald-400, Debits should use red-400 or amber-400 depending on anomaly severity. Masked accounts use monospace asterisks."
+  ]
+}
