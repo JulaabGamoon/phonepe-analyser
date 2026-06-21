@@ -6,17 +6,17 @@ import { ArrowLeft } from "lucide-react";
 
 export default function DateDrillDown({ dateKey }) {
   const transactions = useStore((s) => s.transactions);
+  const filters = useStore((s) => s.filters);
   const selectDate = useStore((s) => s.selectDate);
   const selectTransaction = useStore((s) => s.selectTransaction);
   const selectEntity = useStore((s) => s.selectEntity);
 
-  const dayTxs = useMemo(
-    () =>
-      transactions
-        .filter((t) => t.dateKey === dateKey)
-        .sort((a, b) => (a.sourceRowIndex || 0) - (b.sourceRowIndex || 0)),
-    [transactions, dateKey]
-  );
+  const dayTxs = useMemo(() => {
+    let list = transactions.filter((t) => t.dateKey === dateKey);
+    if (filters.direction === "Debit") list = list.filter((t) => t.direction === "Debit");
+    else if (filters.direction === "Credit") list = list.filter((t) => t.direction === "Credit");
+    return list.sort((a, b) => (a.sourceRowIndex || 0) - (b.sourceRowIndex || 0));
+  }, [transactions, dateKey, filters.direction]);
 
   const totals = useMemo(() => {
     let debit = 0,

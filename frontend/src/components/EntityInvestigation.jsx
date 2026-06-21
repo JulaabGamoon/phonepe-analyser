@@ -71,6 +71,7 @@ function BreakdownTable({ title, rows, testId, onRowClick }) {
 export default function EntityInvestigation() {
   const entity = useStore((s) => s.entityById.get(s.selectedEntityId));
   const transactions = useStore((s) => s.transactions);
+  const filters = useStore((s) => s.filters);
   const selectedDateKey = useStore((s) => s.selectedDateKey);
   const selectDate = useStore((s) => s.selectDate);
   const pinned = useStore((s) => s.pinnedEntities);
@@ -81,8 +82,11 @@ export default function EntityInvestigation() {
 
   const entityTxs = useMemo(() => {
     if (!entity) return [];
-    return transactions.filter((t) => t.entityId === entity.entityId).sort((a, b) => a.date - b.date);
-  }, [entity, transactions]);
+    let list = transactions.filter((t) => t.entityId === entity.entityId);
+    if (filters.direction === "Debit") list = list.filter((t) => t.direction === "Debit");
+    else if (filters.direction === "Credit") list = list.filter((t) => t.direction === "Credit");
+    return list.sort((a, b) => a.date - b.date);
+  }, [entity, transactions, filters.direction]);
 
   if (!entity) {
     return (
@@ -209,8 +213,13 @@ export default function EntityInvestigation() {
           {/* Transactions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber-500">
-                transactions · {entityTxs.length}
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber-500 flex items-center gap-2">
+                <span>transactions · {entityTxs.length}</span>
+                {filters.direction !== "all" && (
+                  <span className="text-[9px] tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 normal-case">
+                    filter: {filters.direction.toLowerCase()} only · {entity.txCount - entityTxs.length} hidden
+                  </span>
+                )}
               </div>
               <div className="text-[10px] font-mono text-slate-500 flex items-center gap-3">
                 <span className="flex items-center gap-1">

@@ -36,6 +36,8 @@ export default function EntityExplorer() {
       });
     }
     if (filters.maskedOnly) list = list.filter((e) => e.isMasked);
+    if (filters.direction === "Debit") list = list.filter((e) => (e.totalDebit || 0) > 0);
+    else if (filters.direction === "Credit") list = list.filter((e) => (e.totalCredit || 0) > 0);
     if (filters.flagType) {
       const ids = new Set(findings.filter((f) => f.type === filters.flagType).map((f) => f.entityId));
       list = list.filter((e) => ids.has(e.entityId));
