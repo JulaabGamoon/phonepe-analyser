@@ -142,14 +142,14 @@ export default function UploadView() {
             back
           </button>
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-500 mb-3">
-            encrypted pdf
+            password-protected pdf
           </div>
           <h2 className="font-heading text-2xl font-bold text-slate-50 mb-2">
-            This statement is password-protected.
+            Need the password to open this statement
           </h2>
           <p className="text-sm text-slate-400 mb-6 font-mono leading-relaxed">
-            PhonePe and most bank PDFs use your DOB (DDMMYYYY) or a phone-number-derived code.
-            Decryption happens entirely in your browser — the password is never sent anywhere.
+            PhonePe and most bank PDFs use your date of birth (DDMMYYYY) or a phone-number-derived
+            code. Your password stays in this browser — it's never sent anywhere.
           </p>
 
           <form onSubmit={onSubmitPassword} className="space-y-3">
@@ -172,7 +172,7 @@ export default function UploadView() {
               className="w-full inline-flex items-center justify-center gap-2 bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-mono uppercase tracking-wider transition-colors"
             >
               {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-              {busy ? "decrypting…" : "unlock & parse"}
+              {busy ? "opening…" : "open my statement"}
             </button>
             {passwordError && (
               <div
@@ -198,17 +198,17 @@ export default function UploadView() {
       <div className="w-full max-w-3xl">
         <div className="mb-10">
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-amber-500 mb-3">
-            ledger / lens
+            statement lens
           </div>
           <h1 className="font-heading text-4xl sm:text-5xl font-bold text-slate-50 leading-tight">
-            Forensic CSV review,
+            See where your money
             <br />
-            <span className="text-amber-500">entity-first.</span>
+            <span className="text-amber-500">actually goes.</span>
           </h1>
           <p className="text-slate-400 mt-4 max-w-xl text-sm leading-relaxed">
-            Upload a bank-statement CSV or a PhonePe PDF (password-protected supported).
-            We resolve aliases into entities, surface duplicates, round-number transfers,
-            masked accounts and recurring patterns — all in your browser.
+            Drop in your PhonePe statement (PDF, password-protected is fine) or any bank CSV.
+            We group every payee, untangle aliases, separate genuine spend from transfers between
+            your own accounts, and surface anything worth a second look — all on your device.
           </p>
         </div>
 
@@ -242,11 +242,10 @@ export default function UploadView() {
             <UploadIcon className="w-7 h-7 mx-auto text-slate-500 mb-4" strokeWidth={1.5} />
           )}
           <div className="font-mono text-sm text-slate-300">
-            {busy ? "Parsing…" : "Drop CSV or PDF here · or click to browse"}
+            {busy ? "Reading your statement…" : "Drop your statement here · or click to choose a file"}
           </div>
           <div className="font-mono text-xs text-slate-500 mt-2">
-            CSV: Date, Name, Debit/Credit, Amount, Category &nbsp;·&nbsp; PDF: PhonePe statement
-            (encrypted ok)
+            Works with PhonePe PDFs (encrypted ok) and bank CSVs (Date, Name, Debit/Credit, Amount)
           </div>
         </label>
 
@@ -258,10 +257,10 @@ export default function UploadView() {
             className="inline-flex items-center gap-2 bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 disabled:opacity-50 px-4 py-2 text-sm font-mono uppercase tracking-wider transition-colors"
           >
             <Sparkles className="w-4 h-4" strokeWidth={2} />
-            Load sample data
+            Try it with sample data
           </button>
           <span className="text-xs text-slate-500 font-mono">
-            instant demo · 40 rows · spec aliases included
+            no upload needed · ready in a click
           </span>
         </div>
 
@@ -282,10 +281,10 @@ export default function UploadView() {
 
         <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-px bg-slate-800">
           {[
-            ["entities", "resolved + scored"],
-            ["timelines", "yearly · monthly · daily"],
-            ["patterns", "duplicates · bursts · recurring"],
-            ["exports", "csv + json snapshots"],
+            ["payees", "every person & merchant"],
+            ["timeline", "by year, month and day"],
+            ["worth checking", "duplicates · round amounts · self-transfers"],
+            ["downloads", "csv + json of your view"],
           ].map(([title, sub]) => (
             <div key={title} className="bg-slate-950 p-4">
               <div className="font-mono text-xs uppercase tracking-[0.2em] text-amber-500">
@@ -298,7 +297,7 @@ export default function UploadView() {
 
         <div className="mt-8 flex items-center gap-2 text-xs text-slate-500 font-mono">
           <FileText className="w-3.5 h-3.5" />
-          100% client-side · PDF decryption local · nothing is uploaded
+          100% on your device · your statement never leaves your browser
         </div>
       </div>
     </div>
